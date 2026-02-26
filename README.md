@@ -1,70 +1,55 @@
-# AIcloset-backend
-Repo para aprender back (node | express | tsoa | jest | docker | y todo los que se te ocurra)
+# 🚀 Backend Architecture Template (Node.js 20 + TS)
+
+Este repositorio contiene la arquitectura base para microservicios de alto rendimiento, diseñada con un enfoque en **Type-Safety**, **escalabilidad** y **documentación automática**.
+
+## 🛠 Stack Tecnológico
+
+| Componente | Tecnología |
+| :--- | :--- |
+| **Runtime** | Node.js 20 (LTS) |
+| **Lenguaje** | TypeScript 5 (Strict Mode + Decorators) |
+| **Framework HTTP** | Express 4 |
+| **ORM** | TypeORM 0.3 (PostgreSQL) |
+| **Cache / Colas** | Redis (ioredis) |
+| **Autenticación** | Passport.js (Google & Microsoft SSO) + JWT |
+| **Documentación** | TSOA (OpenAPI/Swagger) |
+| **Infraestructura** | AWS EventBridge (Event-driven) |
+| **Observabilidad** | New Relic + @alanszp/logger (Structured JSON) |
+| **Testing** | Jest + Supertest + Rosie (Factories) |
+
+---
+
+## 📂 Estructura del Proyecto
+
+La arquitectura sigue una separación estricta entre la **Capa de Transporte (API)** y la **Capa de Dominio (Lib)**.
 
 
-## Stack Tecnológico Principal
-Componente	Tecnología
-Runtime	Node.js 20
-Lenguaje	TypeScript 5 (strict mode, decorators habilitados)
-Framework HTTP	Express 4
-ORM	TypeORM 0.3 (PostgreSQL)
-Cache / Colas	Redis vía ioredis
-Autenticación	Passport.js (local, Google SSO, Microsoft SSO) + JWT propio
-Configuración	convict + dotenv
-Validación	class-validator
-Documentación API	TSOA (genera OpenAPI/Swagger automáticamente)
-Eventos	AWS EventBridge
-i18n	i18next con backend de filesystem
-Logging	Librería propia @alanszp/logger (structured JSON logging)
-Monitoreo	New Relic
-Testing	Jest + Supertest + Rosie (factories) + Faker
 
+### 🌐 Capa de API (`src/api/`)
+* **`endpoints/`**: Controladores de TSOA decorados. Son la fuente de verdad para la documentación Swagger.
+* **`middlewares/`**: Gestión de autenticación, roles, MFA y contexto de request.
+* **`ExpressApp.ts`**: Configuración central de Express y registro de rutas.
 
- ##Estructura de carpetas  
- 
-src/
-├── api/                        # Capa HTTP
-│   ├── index.ts                # Entrypoint del servidor
-│   ├── ExpressApp.ts           # Configuración de Express (middlewares + rutas)
-│   ├── controllers/            # Funciones que manejan request/response
-│   ├── routes/                 # Definición de rutas Express (Router)
-│   ├── endpoints/              # Controllers TSOA (decorados, generan docs automáticas)
-│   ├── middlewares/            # Middlewares (auth, context, roles, MFA)
-│   └── tsoa/                   # Rutas auto-generadas por TSOA
-├── lib/                        # Capa de dominio/negocio
-│   ├── commands/               # Lógica de negocio (orquestadores)
-│   ├── models/                 # Entidades TypeORM + Inputs (DTOs validables)
-│   ├── repositories/           # Queries a base de datos
-│   ├── views/                  # Transformadores entity → response JSON
-│   ├── clients/                # Clientes HTTP a otros microservicios
-│   ├── events/                 # Publishers de eventos (EventBridge)
-│   ├── helpers/                # Utilidades (error handling, audit, etc.)
-│   ├── reports/                # Lógica de reportes complejos
-│   ├── validators/             # Validadores adicionales
-│   ├── mappers/                # Mapeadores
-│   └── utils/                  # Funciones utilitarias
-├── workers/                    # Workers que procesan colas (BullMQ/Redis)
-├── queues/                     # Configuración del queue manager
-├── serverless/                 # Funciones lambda/serverless
-├── scripts/                    # Scripts utilitarios
-├── test/                       # Tests unitarios e integración
-├── config.ts                   # Configuración centralizada (convict)
-├── dbConnection.ts             # Conexiones a BD (principal, read-replica, DW)
-├── ormconfig.ts                # Configuración de TypeORM
-├── cache.ts                    # Wrapper de Redis para cache
-├── logger.ts / getLogger.ts    # Logger con contexto compartido
-├── getContext.ts               # Shared context (request-scoped)
-├── passportInstance.ts          # Estrategias de autenticación
-└── translations.ts             # i18next setup  
+### 🧠 Capa de Dominio (`src/lib/`)
+* **`commands/`**: Patrón Command. Orquestadores de la lógica de negocio.
+* **`models/`**: Entidades de TypeORM y DTOs de entrada validados con `class-validator`.
+* **`repositories/`**: Lógica de persistencia y consultas complejas.
+* **`views/`**: Presenters encargados de transformar entidades en respuestas JSON consistentes.
 
+### ⚙️ Otros Módulos
+* **`workers/`**: Procesamiento asíncrono con BullMQ/Redis.
+* **`serverless/`**: Funciones desacopladas para ejecución en AWS Lambda.
 
-## Para Replicar esta Arquitectura en un Nuevo Proyecto
- 0.  Inicializar proyecto TypeScript con Node 20 y tsconfig.json con decorators habilitados
-1. Instalar dependencias core: express, typeorm, pg, convict, dotenv, class-validator, ioredis, passport, tsoa
-2. Crear la estructura de carpetas: api/{controllers,routes,middlewares,endpoints}, lib/{commands,models,repositories,views,clients,helpers}
-3. Configurar convict con esquema tipado para toda la configuración
-4. Configurar TypeORM con DataSource y SnakeNamingStrategy
-5. Implementar el patrón: Route → Controller → Input.validate() → Command → Repository → View
-6. Implementar SharedContext (usando AsyncLocalStorage) para logger y audit por request
-7. Configurar TSOA para documentación automática
-8. Dockerizar con Dockerfile multi-stage y docker-compose para Swagger UI
+---
+
+## 🏗 Patrón de Implementación
+
+Para asegurar la mantenibilidad, cada flujo debe seguir esta cadena de responsabilidades:
+
+1. **Route/Endpoint**: Recibe el request.
+2. **Input Validation**: `class-validator` asegura que los datos sean correctos antes de seguir.
+3. **Command**: Ejecuta la lógica de negocio (ej. `CreateUserCommand`).
+4. **Repository**: Interactúa con PostgreSQL.
+5. **View**: Formatea la salida (Entity -> JSON).
+
+---
