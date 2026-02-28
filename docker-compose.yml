@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: closet_db
+    ports:
+      - "5433:5432" # Cambiamos el puerto externo a 5433
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6380:6379" # Mantenemos el 6380 que cambiamos antes
