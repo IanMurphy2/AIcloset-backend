@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:tsoa": "tsoa spec-and-routes",
+    "dev": "npm run build:tsoa && ts-node-dev --respawn --transpile-only src/api/index.ts",
+    "build": "npm run build:tsoa && tsc",
+    "start": "node dist/api/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +27,7 @@
     "passport-local": "^1.0.0",
     "pg": "^8.19.0",
     "reflect-metadata": "^0.2.2",
+    "swagger-ui-express": "^5.0.1",
     "tsoa": "^7.0.0-alpha.0",
     "typeorm": "^0.3.28"
   },
@@ -33,6 +38,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.3.0",
     "@types/passport": "^1.0.17",
+    "@types/swagger-ui-express": "^4.1.8",
     "jest": "^30.2.0",
     "rosie": "^2.1.1",
     "supertest": "^7.2.2",
